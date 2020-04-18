@@ -8,7 +8,7 @@ from django.db import models
 
 - Field options
   * null  
-  * blank 
+  * blank
   * choices
   * db_column
   * db_index
@@ -142,6 +142,35 @@ from django.db import models
   class UUIDField(**options)
   ```
 
+- Model Meta options
+  * abstract
+  * app_label
+  * base_manager_name
+  * db_table
+    * Tablenames
+  * db_tablespace
+  * default_manager_name
+  * default_related_name
+  * get_latest_by
+  * managed
+  * order_with_respect_to
+  * ordering
+  * permissions
+  * default_permissions
+  * proxy
+  * required_db_features
+  * required_db_vendor
+  * select_on_save
+  * indexes
+  * unique_together
+  * index_together
+  * constraints
+  * verbose_name
+  * verbose_name_plural
+- Read-only Meta attributes
+  * label
+  * label_lower
+
 - Relationship fields
   * ForeignKey
   ```python
@@ -169,11 +198,11 @@ from django.db import models
 
         * SET()
           > Set the **ForeignKey** to the value passed to SET(), or if a callable is passed in, the result of calling it. In most cases, passing a       callable will be necessary to avoid executing queries at the time your models.py is imported:
-          
+
 ## Form fields
 
   * Field
-  * 
+  *
 
 ## Authentication
 
@@ -216,4 +245,3 @@ from django.contrib.auth.models import User
   * has_perms(perm_list, obj=None)
   * has_module_perms(package_name)
   * email_user(subject, message, form_email=None, )
-
