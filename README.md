@@ -1,47 +1,5 @@
 # django3-cheat-sheet
 
-## Authentication
-
-- Authentication class
-
-```python
-from django.contrib.auth.models import User
-
-```
-- Class Fields
-  * username
-  * first_name
-  * last_name
-  * email
-  * password
-  * groups
-  * user_permissions
-  * is_staff
-  * is_active
-  * is_superuser
-  * last_login
-  * date_joined
-
-- Class Attributes
-  * is_authenticated
-  * is_anonymous
-
-- Class Methods
-  * get_username()
-  * get_full_name()
-  * get_short_name()
-  * set_password()
-  * check_password()
-  * set_unusable_password()
-  * has_usable_password()
-  * get_user_permissions(obj=None)
-  * get_group_permissions(obj=None)
-  * get_all_permissions(obj=None)
-  * has_perm(perm, obj=None)
-  * has_perms(perm_list, obj=None)
-  * has_module_perms(package_name)
-  * email_user(subject, message, form_email=None, )
-
 ## Model field reference
 
 ```python
@@ -49,8 +7,8 @@ from django.db import models
 ```
 
 - Field options
-  * null  Default is False.
-  * blank Default is False.
+  * null  
+  * blank 
   * choices
   * db_column
   * db_index
@@ -211,3 +169,46 @@ from django.db import models
 
         * SET()
           > Set the **ForeignKey** to the value passed to SET(), or if a callable is passed in, the result of calling it. In most cases, passing a       callable will be necessary to avoid executing queries at the time your models.py is imported:
+          
+## Authentication
+
+- Authentication class
+
+```python
+from django.contrib.auth.models import User
+
+```
+- Class Fields
+  * username
+  * first_name
+  * last_name
+  * email
+  * password
+  * groups
+  * user_permissions
+  * is_staff
+  * is_active
+  * is_superuser
+  * last_login
+  * date_joined
+
+- Class Attributes
+  * is_authenticated
+  * is_anonymous
+
+- Class Methods
+  * get_username()
+  * get_full_name()
+  * get_short_name()
+  * set_password()
+  * check_password()
+  * set_unusable_password()
+  * has_usable_password()
+  * get_user_permissions(obj=None)
+  * get_group_permissions(obj=None)
+  * get_all_permissions(obj=None)
+  * has_perm(perm, obj=None)
+  * has_perms(perm_list, obj=None)
+  * has_module_perms(package_name)
+  * email_user(subject, message, form_email=None, )
+
