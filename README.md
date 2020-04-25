@@ -245,3 +245,29 @@ from django.contrib.auth.models import User
   * has_perms(perm_list, obj=None)
   * has_module_perms(package_name)
   * email_user(subject, message, form_email=None, )
+
+- manage.py commands
+  * check
+  * compilemessages
+  * createcachetable
+  * dbshell
+  * diffsettings
+  * dumpdata
+  * flush
+  * inspectdb
+  * loaddata
+  * makemessages
+  * makemigrations
+  * migrate
+  * runserver
+  * sendtestemail
+  * shell
+  * showmigrations
+  * sqlflush
+  * sqlmigrate
+  * sqlsequencereset
+  * squashmigrations
+  * startapp
+  * startproject
+  * test
+  * testserver
