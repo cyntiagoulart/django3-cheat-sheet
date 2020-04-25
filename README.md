@@ -300,3 +300,140 @@ from django.contrib.auth.models import User
   * startproject
   * test
   * testserver
+
+- ModelAdmin options
+
+  * actions
+  * actions_on_top
+  * actions_on_bottom
+    > Controls where on the page the actions bar appears. By default, the admin changelist displays actions at the top of the page (actions_on_top = True; actions_on_bottom = False).
+  * actions_selection_counter
+    > Controls whether a selection counter is displayed next to the action dropdown. By default, the admin changelist will display it (actions_selection_counter = True).
+  * date_hierarchy
+    > Set date_hierarchy to the name of a DateField or DateTimeField in your model, and the change list page will include a date-based drilldown navigation by that field.
+    Example:
+    ```python
+      date_hierarchy = 'pub_date'
+    ```
+  * empty_value_display
+  > This attribute overrides the default display value for record’s fields that are empty (None, empty string, etc.). The default value is - (a dash). For example:
+  ```python
+    from django.contrib import admin
+    class AuthorAdmin(admin.ModelAdmin):
+      empty_value_display = '-empty-'
+  ```
+  * exclude
+  > This attribute, if given, should be a list of field names to exclude from the form.
+  ```python
+    from django.db import models
+    class Author(models.Model):
+      name = models.CharField(max_length=100)
+      title = models.CharField(max_length=3)
+      birth_date = models.DateField(blank=True, null=True)
+  ```
+  ```python
+    from django.contrib import admin
+    class AuthorAdmin(admin.ModelAdmin):
+        fields = ('name', 'title')
+    class AuthorAdmin(admin.ModelAdmin):
+        exclude = ('birth_date',)
+  ```
+  * fields
+  ```python
+  class FlatPageAdmin(admin.ModelAdmin):
+    fields = ('url', 'title', 'content')
+  ```
+  > In the above example, only the fields url, title and content will be displayed, sequentially
+  >To display multiple fields on the same line, wrap those fields in their own tuple.
+  ```python
+  class FlatPageAdmin(admin.ModelAdmin):
+    fields = (('url', 'title'), 'content')
+  ```
+  * fieldsets
+  * filter_horizontal
+  * filter_vertical
+  * form
+  * formfield_overrides
+  * inlines
+  * list_display
+  * list_display_links
+  * list_editable
+  * list_filter
+  > Set list_filter to activate filters in the right sidebar of the change list page of the admin
+  * list_max_show_all
+  * list_per_page
+  * list_select_related
+  * ordering
+  * paginator
+  * prepopulated_fields
+  * preserve_filters
+  * radio_fields
+  * autocomplete_fields
+  * raw_id_fields
+  * readonly_fields
+  * save_as
+  * save_as_continue
+  * save_on_top
+  * search_fields
+  * show_full_result_count
+  * sortable_by
+  * view_on_site
+  * add_form_template
+  * change_form_template
+  * change_list_template
+  * delete_confirmation_template
+  * delete_selected_confirmation_template
+  * object_history_template
+  * popup_response_template
+- ModelAdmin methods
+  * save_model(request, obj, form, change)
+  * delete_model(request, obj)
+  * delete_queryset(request, queryset)
+  * save_formset(request, form, formset, change)
+  * get_ordering(request)
+  * get_search_results(request, queryset, search_term)
+  * save_related(request, form, formsets, change)
+  * get_autocomplete_fields(request)
+  * get_readonly_fields(request, obj=None)
+  * get_prepopulated_fields(request, obj=None)
+  * get_list_display(request)
+  * get_list_display_links(request, list_display)
+  * get_exclude(request, obj=None)
+  * get_fields(request, obj=None)
+  * get_fieldsets(request, obj=None)
+  * get_list_filter(request)
+  * get_list_select_related(request)
+  * get_search_fields(request)
+  * get_sortable_by(request)
+  * get_inline_instances(request, obj=None)
+  * get_inlines(request, obj)
+  > New in Django3.0
+  * get_urls()
+  * get_form(request, obj=None, **kwargs)
+  * get_formsets_with_inlines(request, obj=None)
+  * formfield_for_foreignkey(db_field, request, **kwargs)
+  * formfield_for_manytomany(db_field, request, **kwargs)
+  * formfield_for_choice_field(db_field, request, **kwargs)
+  * get_changelist(request, **kwargs)
+  * get_changelist_form(request, **kwargs)
+  * get_changelist_formset(request, **kwargs)
+  * lookup_allowed(lookup, value)
+  * has_view_permission(request, obj=None)¶
+  * has_add_permission(request)
+  * has_change_permission(request, obj=None)
+  * has_delete_permission(request, obj=None)
+  * has_module_permission(request)
+  * get_queryset(request)
+  * message_user(request, message, level=messages.INFO, extra_tags='', fail_silently=False)
+  * get_paginator(request, queryset, per_page, orphans=0, allow_empty_first_page=True)
+  * response_add(request, obj, post_url_continue=None)
+  * response_change(request, obj)
+  * response_delete(request, obj_display, obj_id)
+  * get_changeform_initial_data(request)
+  * get_deleted_objects(objs, request)
+  * add_view(request, form_url='', extra_context=None)
+  * change_view(request, object_id, form_url='', extra_context=None)
+  * changelist_view(request, extra_context=None)
+  * delete_view(request, object_id, extra_context=None)
+  * history_view(request, object_id, extra_context=None)
+  
