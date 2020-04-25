@@ -117,6 +117,9 @@ from django.db import models
   ```python
   class SlugField(max_length=50, **options)
   ```
+  This is a field intended to be used in URLs. A slug is a
+  short label that contains only letters, numbers, underscores,
+  or hyphens.
   * SmallAutoField
   ```python
   class SmallAutoField(**options)
