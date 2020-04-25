@@ -224,30 +224,56 @@ from django.contrib.auth.models import User
   * groups
   * user_permissions
   * is_staff
+    Boolean. Designates whether this user can access the admin site.
   * is_active
+    Boolean. Designates whether this user account should be considered active.
   * is_superuser
+    Boolean. Designates that this user has all permissions without explicitly assigning them.
   * last_login
+    A datetime of the user’s last login.
   * date_joined
+    A datetime designating when the account was created. Is set to the current date/time by default when the account is created.
 
 - Class Attributes
   * is_authenticated
+    Read-only attribute which is always True (as opposed to AnonymousUser.is_authenticated which is always False). This is a way to tell if the user has been authenticated. This does not imply any permissions and doesn’t check if the user is active or has a valid session.
   * is_anonymous
+    Read-only attribute which is always False. This is a way of differentiating User and AnonymousUser objects. Generally, you should prefer using is_authenticated to this attribute.
 
 - Class Methods
+- class models.User
+
   * get_username()
+    Returns the username for the user. Since the User model can be swapped out, you should use this method instead of referencing the username attribute directly.
   * get_full_name()
+    Returns the first_name plus the last_name, with a space in between.
   * get_short_name()
-  * set_password()
-  * check_password()
+    Returns the first_name.
+  * set_password(raw_password)
+    Sets the user’s password to the given raw string, taking care of the password hashing. Doesn’t save the User object.
+  * check_password(raw_password)
+    Returns True if the given raw string is the correct password for the user. (This takes care of the password hashing in making the comparison.)
   * set_unusable_password()
   * has_usable_password()
+  - New in Django3.0
   * get_user_permissions(obj=None)
+    Returns a set of permission strings that the user has directly.
+    If obj is passed in, only returns the user permissions for this specific object
   * get_group_permissions(obj=None)
+    Returns a set of permission strings that the user has, through their groups.
+    If obj is passed in, only returns the group permissions for this specific object.
   * get_all_permissions(obj=None)
+    Returns a set of permission strings that the user has, both through group and user permissions.
+    If obj is passed in, only returns the permissions for this specific object
   * has_perm(perm, obj=None)
+    Returns True if the user has the specified permission, where perm is in the format "<app label>.<permission codename>".
+    If the user is inactive, this method will always return False. For an active superuser, this method will always return True
   * has_perms(perm_list, obj=None)
+    Returns True if the user has each of the specified permissions, where each perm is in the format "<app label>.<permission codename>". If the user is inactive, this method will always return False. For an active superuser, this method will always return True.
   * has_module_perms(package_name)
-  * email_user(subject, message, form_email=None, )
+    Returns True if the user has any permissions in the given package (the Django app label). If the user is inactive, this method will always return False. For an active superuser, this method will always return True.
+  * email_user(subject, message, from_email=None, **kwargs)
+    Sends an email to the user. If from_email is None, Django uses the DEFAULT_FROM_EMAIL. Any `**kwargs` are passed to the underlying send_mail() call.
 
 - manage.py commands
   * check
