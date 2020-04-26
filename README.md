@@ -436,4 +436,10 @@ from django.contrib.auth.models import User
   * changelist_view(request, extra_context=None)
   * delete_view(request, object_id, extra_context=None)
   * history_view(request, object_id, extra_context=None)
-  
+
+- InlineModelAdmin objects
+  *
+
+- Modeladmin sample
+![](img/django-admin-code.png)
+![](img/django-admin.png)
