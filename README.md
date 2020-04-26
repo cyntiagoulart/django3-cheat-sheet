@@ -443,3 +443,22 @@ from django.contrib.auth.models import User
 - Modeladmin sample
 ![](img/django-admin-code.png)
 ![](img/django-admin.png)
+
+
+- Model Managers & QuerySet
+
+  > Django QuerySets are lazy; they are only evaluated when they are
+forced to. This behavior makes QuerySets very efficient.
+
+- When QuerySets are evaluated
+
+  > You can concatenate as many filters as you like to a QuerySet, and
+you will not hit the database until the QuerySet is evaluated.
+QuerySets are only evaluated in the following cases:
+  * The first time you iterate over them
+  * When you slice them, for instance, Post.objects.all()[:3]
+  * When you pickle or cache them
+  * When you call repr() or len() on them
+  * When you explicitly call list() on them
+  * When you test them in a statement, such as bool() , or , and , or
+if
