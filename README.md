@@ -414,6 +414,166 @@ from django.db import models
       * Normalizes to: A Python True or False value.
       * Validates that the value is True (e.g. the check box is checked) if the field has required=True.
       * Error message keys: required
+  **Since all Field subclasses have required=True by default, the validation condition here is important. If you want to include a boolean in your form that can be either True or False (e.g. a checked or unchecked checkbox), you must remember to pass in required=False when creating the BooleanField.**
+
+   * class CharField(\**kwargs)
+        * Default widget: TextInput
+        * Empty value: Whatever you’ve given as empty_value.
+        * Normalizes to: A string.
+        * Uses MaxLengthValidator and MinLengthValidator if max_length and min_length are provided. Otherwise, all inputs are valid.
+        * Error message keys: required, max_length, min_length
+
+      > Has three optional arguments for validation:
+        * max_length¶
+        * min_length¶
+          >  If provided, these arguments ensure that the string is at most or at least the given length.
+        * strip
+          > If True (default), the value will be stripped of leading and trailing whitespace.
+        * empty_value¶
+          > The value to use to represent “empty”. Defaults to an empty string.
+   *  class ChoiceField(\**kwargs)
+        * Default widget: Select
+        * Empty value: '' (an empty string)
+        * Normalizes to: A string.
+        * Validates that the given value exists in the list of choices.
+        * Error message keys: required, invalid_choice
+     > The invalid_choice error message may contain %(value)s, which will be replaced with the selected choice.
+
+  * class TypedChoiceField(\**kwargs)
+      > Just like a ChoiceField, except TypedChoiceField takes two extra arguments, coerce and empty_value.
+
+        * Default widget: Select
+        * Empty value: Whatever you’ve given as empty_value.
+        * Normalizes to: A value of the type provided by the coerce argument.
+        * Validates that the given value exists in the list of choices and can be coerced.
+        * Error message keys: required, invalid_choice
+    * Takes extra arguments:
+        * coerce
+
+            > A function that takes one argument and returns a coerced value. Examples include the built-in int, float, bool and other types. Defaults to an identity function. Note that coercion happens after input validation, so it is possible to coerce to a value not present in choices.
+
+        * empty_value
+
+            > The value to use to represent “empty.” Defaults to the empty string; None is another common choice here. Note that this value will not be coerced by the function given in the coerce argument, so choose it accordingly.
+
+  *  class DateField(\**kwargs)
+
+        * Default widget: DateInput
+        * Empty value: None
+        * Normalizes to: A Python datetime.date object.
+        * Validates that the given value is either a datetime.date, datetime.datetime or string formatted in a particular date format.
+        * Error message keys: required, invalid
+
+      * Takes one optional argument:
+
+          * input_formats
+
+              > A list of formats used to attempt to convert a string to a valid datetime.date object.
+
+              > If no input_formats argument is provided, the default input formats are taken from DATE_INPUT_FORMATS if USE_L10N is False, or from the active locale format DATE_INPUT_FORMATS key if localization is enabled.
+  *  class DateTimeField(\**kwargs)
+
+        * Default widget: DateTimeInput
+        * Empty value: None
+        * Normalizes to: A Python datetime.datetime object.
+        * Validates that the given value is either a datetime.datetime, datetime.date or string formatted in a particular datetime format.
+        * Error message keys: required, invalid
+    * Takes one optional argument:
+
+        * input_formats
+
+            > A list of formats used to attempt to convert a string to a valid datetime.datetime object.
+
+            > If no input_formats argument is provided, the default input formats are taken from DATETIME_INPUT_FORMATS if USE_L10N is False, or from the active locale format DATETIME_INPUT_FORMATS key if localization is enabled.
+
+  * class DecimalField(\**kwargs)
+
+        * Default widget: NumberInput when Field.localize is False, else TextInput.
+        * Empty value: None
+        * Normalizes to: A Python decimal.
+        * Validates that the given value is a decimal. Uses MaxValueValidator and MinValueValidator if max_value and min_value are provided. Leading and trailing whitespace is ignored.
+        * Error message keys: required, invalid, max_value, min_value, max_digits, max_decimal_places, max_whole_digits
+
+        > The max_value and min_value error messages may contain %(limit_value)s, which will be substituted by the appropriate limit. Similarly, the max_digits, max_decimal_places and max_whole_digits error messages may contain %(max)s.
+
+        * Takes four optional arguments:
+
+            * max_value
+
+            * min_value
+
+                > These control the range of values permitted in the field, and should be given as decimal.Decimal values.
+
+            * max_digits
+
+                > The maximum number of digits (those before the decimal point plus those after the decimal point, with leading zeros stripped) permitted in the value.
+
+            * decimal_places
+
+                > The maximum number of decimal places permitted.
+
+  * class DurationField(\**kwargs)
+
+        * Default widget: TextInput
+        * Empty value: None
+        * Normalizes to: A Python timedelta.
+        * Validates that the given value is a string which can be converted into a timedelta. The value must be between datetime.timedelta.min and datetime.timedelta.max.
+        * Error message keys: required, invalid, overflow.
+
+      > Accepts any format understood by parse_duration().
+
+  * class EmailField(\**kwargs)
+
+        * Default widget: EmailInput
+        * Empty value: '' (an empty string)
+        * Normalizes to: A string.
+        * Uses EmailValidator to validate that the given value is a valid email address, using a moderately complex regular expression.
+        * Error message keys: required, invalid
+
+       > Has two optional arguments for validation, max_length and min_length. If provided, these arguments ensure that the string is at most or at least the given length.
+
+  * class FileField(\**kwargs)
+
+        * Default widget: ClearableFileInput
+        * Empty value: None
+        * Normalizes to: An UploadedFile object that wraps the file content and file name into a single object.
+        * Can validate that non-empty file data has been bound to the form.
+        * Error message keys: required, invalid, missing, empty, max_length
+
+      > Has two optional arguments for validation, max_length and allow_empty_file. If provided, these ensure that the file name is at most the given length, and that validation will succeed even if the file content is empty.
+      When you use a FileField in a form, you must also remember to [bind the file data to the form.](https://docs.djangoproject.com/en/3.0/topics/http/file-uploads/)
+      The max_length error refers to the length of the filename. In the error message for that key, %(max)d will be replaced with the maximum filename length and %(length)d will be replaced with the current filename length.
+  * class FilePathField(\**kwargs)
+
+        * Default widget: Select
+        * Empty value: '' (an empty string)
+        * Normalizes to: A string.
+        * Validates that the selected choice exists in the list of choices.
+        * Error message keys: required, invalid_choice
+
+        > The field allows choosing from files inside a certain directory. It takes five extra arguments; only path is required:
+
+        * path
+
+             > The absolute path to the directory whose contents you want listed. This directory must exist.
+
+        * recursive
+
+            > If False (the default) only the direct contents of path will be offered as choices. If True, the directory will be descended into recursively and all descendants will be listed as choices.
+
+        * match
+
+            > A regular expression pattern; only files with names matching this expression will be allowed as choices.
+
+        * allow_files
+
+            > Optional. Either True or False. Default is True. Specifies whether files in the specified location should be included. Either this or allow_folders must be True.
+
+        * allow_folders
+
+            > Optional. Either True or False. Default is False. Specifies whether folders in the specified location should be included. Either this or allow_files must be True.
+
+## form field rested
 
 ## Authentication
 
