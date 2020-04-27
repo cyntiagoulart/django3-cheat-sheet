@@ -204,8 +204,216 @@ from django.db import models
 
 ## Form fields
 
-  * Field
-  *
+  * Field.clean(value)
+
+   >Each Field instance has a clean() method, which takes a single argument and either raises a django.forms.ValidationError exception or returns the clean value:
+
+   ```python
+   >>> from django import forms
+   >>> f = forms.EmailField()
+   >>> f.clean('foo@example.com')
+   'foo@example.com'
+   >>> f.clean('invalid email address')
+   Traceback (most recent call last):
+   ...
+   ValidationError: ['Enter a valid email address.']
+   ```
+
+- Core field arguments
+
+   > Each Field class constructor takes at least these arguments. Some Field classes take additional, field-specific arguments, but the following should always be accepted
+
+   * Field.required
+
+   > By default, each Field class assumes the value is required, so if you pass an empty value – either None or the empty string ("") – then clean() will raise a ValidationError exception:
+
+   ```python
+   >>> from django import forms
+   >>> f = forms.CharField()
+   >>> f.clean('foo')
+   'foo'
+   >>> f.clean('')
+   Traceback (most recent call last):
+   ...
+   ValidationError: ['This field is required.']
+   >>> f.clean(None)
+   Traceback (most recent call last):
+   ...
+   ValidationError: ['This field is required.']
+   >>> f.clean(' ')
+   ' '
+   ```
+   > To specify that a field is not required, pass required=False to the Field constructor:
+   ```python
+   >>> f = forms.CharField(required=False)
+   >>> f.clean('foo')
+   'foo'
+   >>> f.clean('')
+   ''
+   >>> f.clean(None)
+   ''
+   >>> f.clean(0)
+   ```
+   > If a Field has required=False and you pass clean() an empty value, then clean() will return a normalized empty value rather than raising ValidationError. For CharField, this will be an empty string. For other Field classes, it might be None. (This varies from field to field.)
+
+   * Field.label
+
+   > The label argument lets you specify the “human-friendly” label for this field. This is used when the Field is displayed in a Form.
+
+   ```python
+   >>> from django import forms
+   >>> class CommentForm(forms.Form):
+   ...     name = forms.CharField(label='Your name')
+   ...     url = forms.URLField(label='Your website', required=False)
+   ...     comment = forms.CharField()
+   >>> f = CommentForm(auto_id=False)
+   >>> print(f)
+   <tr><th>Your name:</th><td><input type="text" name="name" required></td></tr>
+   <tr><th>Your website:</th><td><input type="url" name="url"></td></tr>
+   <tr><th>Comment:</th><td><input type="text" name="comment" required></td></tr>
+   ```
+
+   * Field.label_suffix
+
+   > The label_suffix argument lets you override the form’s label_suffix on a per-field basis:
+
+   ```python
+   >>> class ContactForm(forms.Form):
+   ...     age = forms.IntegerField()
+   ...     nationality = forms.CharField()
+   ...     captcha_answer = forms.IntegerField(label='2 + 2', label_suffix=' =')
+   >>> f = ContactForm(label_suffix='?')
+   >>> print(f.as_p())
+   <p><label for="id_age">Age?</label> <input id="id_age" name="age" type="number" required></p>
+   <p><label for="id_nationality">Nationality?</label> <input id="id_nationality" name="nationality" type="text" required></p>
+   <p><label for="id_captcha_answer">2 + 2 =</label> <input id="id_captcha_answer" name="captcha_answer" type="number" required></p>
+   ```
+
+   * Field.initial
+
+   > The initial argument lets you specify the initial value to use when rendering this Field in an unbound Form.
+
+   > The use-case for this is when you want to display an “empty” form in which a field is initialized to a particular value. For example:
+
+   ```python
+   >>> from django import forms
+   >>> class CommentForm(forms.Form):
+   ...     name = forms.CharField(initial='Your name')
+   ...     url = forms.URLField(initial='http://')
+   ...     comment = forms.CharField()
+   >>> f = CommentForm(auto_id=False)
+   >>> print(f)
+   <tr><th>Name:</th><td><input type="text" name="name" value="Your name" required></td></tr>
+   <tr><th>Url:</th><td><input type="url" name="url" value="http://" required></td></tr>
+   <tr><th>Comment:</th><td><input type="text" name="comment" required></td></tr>
+   ```
+
+   > you can also pass any callable:
+
+   ```python
+   >>> import datetime
+   >>> class DateForm(forms.Form):
+   ...     day = forms.DateField(initial=datetime.date.today)
+   >>> print(DateForm())
+   <tr><th>Day:</th><td><input type="text" name="day" value="12/23/2008" required><td></tr>
+   ```
+
+   *The callable will be evaluated only when the unbound form is displayed, not when it is defined.*
+
+   * Field.widget
+
+   > The widget argument lets you specify a Widget class to use when rendering this Field.
+
+   ```python
+   from django import forms
+   class EmailPostForm(forms.Form):
+      name = forms.CharField(max_length=25)
+      email = forms.EmailField()
+      to = forms.EmailField()
+      comments = forms.CharField(required=False,
+      widget=forms.Textarea)
+    ```
+
+    * Field.help_text
+
+    > The help_text argument lets you specify descriptive text for this Field. If you provide help_text, it will be displayed next to the Field when the Field is rendered by one of the convenience Form methods (e.g., as_ul()).
+    Like the model field’s help_text, this value isn’t HTML-escaped in automatically-generated forms.
+
+    ```python
+    >>> from django import forms
+    >>> class HelpTextContactForm(forms.Form):
+    ...     subject = forms.CharField(max_length=100, help_text='100 characters max.')
+    ...     message = forms.CharField()
+    ...     sender = forms.EmailField(help_text='A valid email address, please.')
+    ...     cc_myself = forms.BooleanField(required=False)
+    >>> f = HelpTextContactForm(auto_id=False)
+    >>> print(f.as_table())
+    <tr><th>Subject:</th><td><input type="text" name="subject" maxlength="100" required><br><span class="helptext">100 characters max.</span></td></tr>
+    <tr><th>Message:</th><td><input type="text" name="message" required></td></tr>
+    <tr><th>Sender:</th><td><input type="email" name="sender" required><br>A valid email address, please.</td></tr>
+    <tr><th>Cc myself:</th><td><input type="checkbox" name="cc_myself"></td></tr>
+    >>> print(f.as_ul()))
+    <li>Subject: <input type="text" name="subject" maxlength="100" required> <span class="helptext">100 characters max.</span></li>
+    <li>Message: <input type="text" name="message" required></li>
+    <li>Sender: <input type="email" name="sender" required> A valid email address, please.</li>
+    <li>Cc myself: <input type="checkbox" name="cc_myself"></li>
+    ```
+
+    * Field.error_messages
+
+    > The error_messages argument lets you override the default messages that the field will raise. Pass in a dictionary with keys matching the error messages you want to override.
+
+    ```python
+    >>> from django import forms
+    >>> generic = forms.CharField()
+    >>> generic.clean('')
+    Traceback (most recent call last):
+      ...
+    ValidationError: ['This field is required.']
+    ```
+    > And here is a custom error message:
+    ```python
+    >>> name = forms.CharField(error_messages={'required': 'Please enter your name'})
+    >>> name.clean('')
+    Traceback (most recent call last):
+      ...
+    ValidationError: ['Please enter your name']
+    ```
+
+    * Field.validators
+
+    > The validators argument lets you provide a list of validation functions for this field.
+    ```python
+    from django.db import models
+    from django.core.validators import MinValueValidator, MaxValueValidator
+    class Coupon(models.Model):
+        code = models.CharField(max_length=50, unique=True)
+        valid_from = models.DateTimeField()
+        valid_to = models.DateTimeField()
+        discount = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(100)])
+        active = models.BooleanField()
+        def __str__(self):
+           return self.code
+    ```
+    * Field.localize
+
+    > The localize argument enables the localization of form data input, as well as the rendered output.
+
+    * Field.disabled
+
+    > The disabled boolean argument, when set to True, disables a form field using the disabled HTML attribute so that it won’t be editable by users. Even if a user tampers with the field’s value submitted to the server, it will be ignored in favor of the value from the form’s initial data.
+
+    * Field.has_changed()
+
+    > The has_changed() method is used to determine if the field value has changed from the initial value. Returns True or False.
+
+  - Built-in Field classes
+  * class BooleanField(\**kwargs)
+      * Default widget: CheckboxInput
+      * Empty value: False
+      * Normalizes to: A Python True or False value.
+      * Validates that the value is True (e.g. the check box is checked) if the field has required=True.
+      * Error message keys: required
 
 ## Authentication
 
@@ -272,8 +480,8 @@ from django.contrib.auth.models import User
     Returns True if the user has each of the specified permissions, where each perm is in the format "<app label>.<permission codename>". If the user is inactive, this method will always return False. For an active superuser, this method will always return True.
   * has_module_perms(package_name)
     Returns True if the user has any permissions in the given package (the Django app label). If the user is inactive, this method will always return False. For an active superuser, this method will always return True.
-  * email_user(subject, message, from_email=None, **kwargs)
-    Sends an email to the user. If from_email is None, Django uses the DEFAULT_FROM_EMAIL. Any `**kwargs` are passed to the underlying send_mail() call.
+  * email_user(subject, message, from_email=None, \**kwargs)
+    Sends an email to the user. If from_email is None, Django uses the DEFAULT_FROM_EMAIL. Any `\**kwargs` are passed to the underlying send_mail() call.
 
 - manage.py commands
   * check
@@ -409,14 +617,14 @@ from django.contrib.auth.models import User
   * get_inlines(request, obj)
   > New in Django3.0
   * get_urls()
-  * get_form(request, obj=None, **kwargs)
+  * get_form(request, obj=None, \**kwargs)
   * get_formsets_with_inlines(request, obj=None)
-  * formfield_for_foreignkey(db_field, request, **kwargs)
-  * formfield_for_manytomany(db_field, request, **kwargs)
-  * formfield_for_choice_field(db_field, request, **kwargs)
-  * get_changelist(request, **kwargs)
-  * get_changelist_form(request, **kwargs)
-  * get_changelist_formset(request, **kwargs)
+  * formfield_for_foreignkey(db_field, request, \**kwargs)
+  * formfield_for_manytomany(db_field, request, \**kwargs)
+  * formfield_for_choice_field(db_field, request, \**kwargs)
+  * get_changelist(request, \**kwargs)
+  * get_changelist_form(request, \**kwargs)
+  * get_changelist_formset(request, \**kwargs)
   * lookup_allowed(lookup, value)
   * has_view_permission(request, obj=None)¶
   * has_add_permission(request)
@@ -464,8 +672,8 @@ QuerySets are only evaluated in the following cases:
 if
 
 - QuerySets Methods
-  * filter(**kwargs)
-  > Returns a new QuerySet containing objects that match the given lookup parameters.The lookup parameters (**kwargs) should be in the format described in Field lookups below. Multiple parameters are joined via AND in the underlying SQL statement
+  * filter(\**kwargs)
+  > Returns a new QuerySet containing objects that match the given lookup parameters.The lookup parameters (\**kwargs) should be in the format described in Field lookups below. Multiple parameters are joined via AND in the underlying SQL statement
     - Field lookups
       > Field lookups are how you specify the meat of an SQL WHERE clause. They’re specified as keyword arguments to the QuerySet methods filter(), exclude() and get().
       > As a convenience when no lookup type is provided (like in Entry.objects.get(id=14)) the lookup type is assumed to be exact.
@@ -653,3 +861,98 @@ if
       > (No equivalent SQL code fragment is included for this lookup because implementation of the relevant query varies among different database engines.)
       When USE_TZ is True, datetime fields are converted to the current time zone before filtering. This requires time zone definitions in the database.
 # QUERYSETS  IS REST
+
+- Django shortcut functions
+  * render(request, template_name, context=None, content_type=None, status=None, using=None)
+  > Combines a given template with a given context dictionary and returns an HttpResponse object with that rendered text.
+  Django does not provide a shortcut function which returns a TemplateResponse because the constructor of TemplateResponse offers the same level of convenience as render().
+    - Required arguments
+      * request
+      > The request object used to generate this response.
+      * template_name
+      > The full name of a template to use or sequence of template names. If a sequence is given, the first template that exists will be used
+    - Optional arguments
+      * context
+      > A dictionary of values to add to the template context. By default, this is an empty dictionary. If a value in the dictionary is callable, the view will call it just before rendering the template.
+      * content_type
+      > The MIME type to use for the resulting document. Defaults to 'text/html'.
+      * status
+      > The status code for the response. Defaults to 200.
+      * using
+      > The NAME of a template engine to use for loading the template.
+      Example:
+      ```python
+      from django.shortcuts import render
+      from .models import Post
+      def post_list(request):
+        posts = Post.published.all()
+        return render(request,
+        'blog/post/list.html',
+        {'posts': posts})
+      ```
+  * redirect(to, *args, permanent=False, \**kwargs)
+  > Returns an HttpResponseRedirect to the appropriate URL for the arguments passed.
+  The arguments could be:
+    * A model: the model’s get_absolute_url() function will be called.
+    * A view name, possibly with arguments: reverse() will be used to reverse-resolve the name.
+    * An absolute or relative URL, which will be used as-is for the redirect location.
+    > By default issues a temporary redirect; pass permanent=True to issue a permanent redirect.
+    Example
+    ```python
+    from django.shortcuts import redirect
+    def my_view(request):
+      ...
+      obj = MyModel.objects.get(...)
+      return redirect(obj)
+    ```
+  * get_object_or_404(klass, \*args, \**kwargs)
+  > Calls get() on a given model manager, but it raises Http404 instead of the model’s DoesNotExist exception
+    * Required arguments
+      * klass
+        > A Model class, a Manager, or a QuerySet instance from which to get the object.
+      * \**kwargs
+        > Lookup parameters, which should be in the format accepted by get() and filter().
+        Example:
+        ```python
+        from django.shortcuts import get_object_or_404
+        def my_view(request):
+            obj = get_object_or_404(MyModel, pk=1)
+        ```
+  * get_list_or_404(klass, \*args, \**kwargs)
+  > Returns the result of filter() on a given model manager cast to a list, raising Http404 if the resulting list is empty.
+    * Required arguments
+      * klass
+      > A Model, Manager or QuerySet instance from which to get the list.
+      * \**kwargs
+      > Lookup parameters, which should be in the format accepted by get() and filter()
+
+
+
+# LISTview & DETAILview
+```python
+from django.views.generic import ListView
+class PostListView(ListView):
+    queryset = Post.published.all()
+    context_object_name = 'posts'
+    paginate_by = 3
+    template_name = 'blog/post/list.html'
+```
+- description
+ * Use a specific QuerySet instead of retrieving all objects.
+   Instead of defining a **queryset** attribute, we could have
+   specified **model = Post** and Django would have built the generic
+   **Post.objects.all()** QuerySet for us.
+ * Use the context variable **posts** for the query results. The
+   default variable is **object_list** if we don't specify any
+   **context_object_name**.
+ * Use a custom template to render the page. If we don't set a
+  default template, **ListView** will use **blog/post_list.html**.
+ * Django's ListView generic view
+   passes the selected page in a variable called page_obj
+
+  url.py
+  ```python
+  urlpatterns = [
+      path('', views.PostListView.as_view(), name='post_list')
+  ]
+  ```
