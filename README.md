@@ -8,10 +8,23 @@ from django.db import models
 
 - Field options
   * null  
+    > If True, Django will store empty values as NULL in the database. Default is False.
+    Avoid using null on string-based fields such as CharField and TextField. If a string-based field has null=True, that means it has two possible values for “no data”: NULL, and the empty string. In most cases, it’s redundant to have two possible values for “no data;” the Django convention is to use the empty string, not NULL. One exception is when a CharField has both unique=True and blank=True set. In this situation, null=True is required to avoid unique constraint violations when saving multiple objects with blank values.
+    For both string-based and non-string-based fields, you will also need to set blank=True if you wish to permit empty values in forms, as the null parameter only affects database storage
+
   * blank
+    > If True, the field is allowed to be blank. Default is False.
+    Note that this is different than null. null is purely database-related, whereas blank is validation-related. If a field has blank=True, form validation will allow entry of an empty value. If a field has blank=False, the field will be required.
+
   * choices
+    > A sequence consisting itself of iterables of exactly two items (e.g. [(A, B), (A, B) ...]) to use as choices for this field. If choices are given, they’re enforced by model validation and the default form widget will be a select box with these choices instead of the standard text field.
+    The first element in each tuple is the actual value to be set on the model, and the second element is the human-readable name
+    Generally, it’s best to define choices inside a **model class**, and to define a suitably-named constant for each value
+
   * db_column
   * db_index
+    > If True, a database index will be created for this field.
+    
   * db_tablespace
   * default
   * editable
